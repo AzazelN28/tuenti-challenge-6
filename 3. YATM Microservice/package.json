@@ -1,0 +1,14 @@
+{
+  "name": "yatm-microservice",
+  "version": "1.0.0",
+  "description": "At Tuenti, we have a degree of freedom to choose the language of different microservices. Each microservice is based on what the developer knows best and what they think is the most suitable platform for the thing they are solving. We recently discovered a microservice running on an old platform, and we want to create a docker image in order to replace it with newer instances. We were able to extract the code from the machines and we also dumped the contents, which originally looked like this:",
+  "main": "sample.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "js-yaml": "^3.6.0"
+  }
+}

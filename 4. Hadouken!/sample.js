@@ -3,27 +3,10 @@
 const fs = require("fs");
 
 const combos = fs.readFileSync("combos.txt")
-                .toString()
-                .split("\n")
-                .map((line) => line.split("-"));
-
-function findCombosByFirstMovement(movement) {
-  return combos.filter((combo) => combo[0] === movement);
-}
-
-function filterMaybeCombos(movement, current, position) {
-  return current.filter((current) => current[position] === movement);
-}
-
-function compare(a,b) {
-  const length = Math.min(a.length, b.length);
-  for (let i = 0; i < length; i++) {
-    if (a[i] !== b[i]) {
-      return false;
-    }
-  }
-  return true;
-}
+                 .toString()
+                 .split("\n")
+                 .filter((line) => line !== "")
+                 .map((line) => line.split("-"));
 
 const input = fs.readFileSync("sampleInput.txt")
                 .toString()
@@ -32,48 +15,51 @@ const input = fs.readFileSync("sampleInput.txt")
 const count = input.shift();
 
 const sessions = input.map((line) => line.split("-"));
-for (let index = 0; index < count; index++) {
 
-  const session = sessions[index];
-  if (session.length < 3) {
-    continue;
-  }
-
-  let movement = null,
-      maybeCombos = [],
-      combos = 0,
-      stack = [];
-
-  while (movement = session.shift()) {
-
-    //console.log("movement", movement);
-    if (maybeCombos.length > 0) {
-      maybeCombos = filterMaybeCombos(movement, maybeCombos, stack.length);
-      if (maybeCombos.length > 0) {
-        stack.push(movement);
-        if (maybeCombos.length === 1 && stack.length === maybeCombos[0].length - 1) {
-          combos++;
-
-          //console.log("Combo!", stack);
-
-          stack = [];
-          maybeCombos = [];
-        }
-      } else {
-        maybeCombos = [];
-        stack = [];
-      }
-    }
-
-    if (maybeCombos.length === 0) {
-      maybeCombos = findCombosByFirstMovement(movement);
-      if (maybeCombos.length > 0) {
-        stack.push(movement);
-      }
-    }
-
-  }
-
-  console.log(`Case #${index + 1}: ${combos}`);
-
+function findComboByMovement(movement, combos) {
+  return combos.filter((combo) => combo[0] === movement);
 }
+
+function isCombo(movements, combo) {
+  return movements.reduce((initial, movement, index) => {
+    if ((index < combo.length - 1 && movement !== combo[index])
+     || (index === combo.length - 1 && movement === combo[index])) {
+      initial = false;
+    }
+    return initial;
+  }, true);
+}
+
+sessions.forEach((session, index) => {
+
+  let num = 0, after = 0;
+
+  // skip those cases that are impossible to
+  if (session.length < 3) {
+    return;
+  }
+
+  session.forEach((movement, index) => {
+    const movements = session.slice(index);
+    if (movements.length < 3 || after > index) {
+      return false;
+    }
+
+    const maybeCombos = findComboByMovement(movement, combos);
+    while (maybeCombos.length > 0) {
+      const maybeCombo = maybeCombos.shift();
+      if (isCombo(movements, maybeCombo)) {
+        num++;
+        if (maybeCombo.length === 6) {
+          after = index + 4;
+        } else {
+          after = 0;
+        }
+      }
+    }
+
+  });
+
+  console.log(`Case #${index + 1}: ${num}`);
+
+});

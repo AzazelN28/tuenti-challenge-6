@@ -9,68 +9,47 @@ const input = fs.readFileSync("testInput.txt")
                 .filter((value,index) => index >= 1)
                 .map((value) => parseInt(value,10));
 
-function isImmiscible(value) {
-  const string = value.toString();
+function magnitude(x) {
+  return Math.floor(Math.log10(x));
+}
+
+let ones = 0, zeroes = 0;
+
+function isImmiscible(x) {
+  const s = x.toString();
 
   let i = 0;
 
-  while (string.charAt(i) === "1") {
-    i++;
-  }
-
-  if (i === string.length) {
-    return true;
-  }
-
-  while (string.charAt(i) === "0") {
-    i++;
-  }
-
-  if (i === string.length) {
-    return true;
-  }
-
-  return false;
-}
-
-function immiscibleCount(value) {
-  const string = value.toString();
-
-  let i = 0,
-      ones = 0,
-      zeroes = 0;
-
-  while (string.charAt(i) === "1") {
+  ones = 0;
+  zeroes = 0;
+  while (s.charAt(i) === "1") {
     i++;
     ones++;
   }
 
-  if (i === string.length) {
-    return [ones,zeroes];
+  if (i === s.length) {
+    return true;
   }
 
-  while (string.charAt(i) === "0") {
+  zeroes = 0;
+  while (s.charAt(i) === "0") {
     i++;
     zeroes++;
   }
 
-  if (i === string.length) {
-    return [ones,zeroes];
+  if (i === s.length) {
+    return true;
   }
 
-  return null;
+  return false;
+
 }
 
-const output = input.map((value) => {
-  process.stderr.write("\x1B[2J");
+for (let index = 0; index < input.length; index++) {
+  const value = input[index];
   let multiple = 1;
   while (!isImmiscible(value * multiple)) {
-    process.stderr.write(`\x1B[0,0H${value} ${multiple} ${memory}`);
     multiple++;
   }
-  return immiscibleCount(value * multiple);
-}).map((value,index) => {
-  return `Case #${index + 1}: ${value[0]} ${value[1]}`;
-}).join("\n");
-
-console.log(output);
+  console.log(`Case #${index + 1}: ${ones} ${zeroes}`);
+}

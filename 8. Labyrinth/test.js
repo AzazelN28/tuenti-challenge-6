@@ -34,6 +34,7 @@ let player = {
 let lastAction = null;
 let cost = 4096;
 let move = UP;
+let frame = 0;
 
 const client = net.connect(1986, "52.49.91.111");
 
@@ -97,9 +98,9 @@ client.on("connect", () => {
       const tx = player.x + x - 3;
       const ty = player.y + y - 3;
 
-      if (tile !== "x") {
+      //if (tile !== "x") {
         map[ty][tx] = tile;
-      }
+      //}
 
       if (tile === "#") {
         passes[ty][tx] = 2048;
@@ -198,13 +199,19 @@ client.on("connect", () => {
     case LT: moveLeft(); break;
   }
 
-  process.stdout.write("\x1B[2J\x1B[0,0H");
-  process.stdout.write("↑\t↓\t←\t→\n");
+  process.stdout.write("\x1B[2J\x1B[0;0H");
+  /*process.stdout.write("↑\t↓\t←\t→\n");
   process.stdout.write(`${up}\t${dn}\t${lt}\t${rt}\n`);
-  process.stdout.write(`${pass_up}\t${pass_dn}\t${pass_lt}\t${pass_rt}\n`);
-  process.stdout.write(string);
-
+  process.stdout.write(`${pass_up}\t${pass_dn}\t${pass_lt}\t${pass_rt}\n`);*/
+  process.stdout.write(map.map((row) => row.join("")).join("\n").replace(/x|[a-f0-9]/g,(fullMatch) => {
+    if (fullMatch === "x") {
+      return `\x1B[1;36mx\x1B[0m`;
+    } else {
+      return `\x1B[0;36m${fullMatch}\x1B[0m`;
+    }
+  }));
   fs.writeFileSync("map.txt", map.map((row) => row.join("")).join("\n"));
+  fs.writeFile(`map/${++frame}.txt`, map.map((row) => row.join("")).join("\n"));
   //console.log(string);
 
 }).on("end", (end) => {
